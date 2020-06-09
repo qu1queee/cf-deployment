@@ -162,13 +162,6 @@ addons:
           deployment: cf
           network: default
           domain: bosh
-      - domain: credhub.service.cf.internal
-        targets:
-        - query: '*'
-          instance_group: credhub
-          deployment: cf
-          network: default
-          domain: bosh
       - domain: doppler.service.cf.internal
         targets:
         - query: '*'
@@ -215,20 +208,6 @@ addons:
         targets:
         - query: '*'
           instance_group: log-api
-          deployment: cf
-          network: default
-          domain: bosh
-      - domain: routing-api.service.cf.internal
-        targets:
-        - query: '*'
-          instance_group: api
-          deployment: cf
-          network: default
-          domain: bosh
-      - domain: silk-controller.service.cf.internal
-        targets:
-        - query: '*'
-          instance_group: diego-api
           deployment: cf
           network: default
           domain: bosh
@@ -366,24 +345,12 @@ instance_groups:
       - name: diego
         password: ((diego_database_password))
         username: diego
-      - name: network_connectivity
-        password: ((network_connectivity_database_password))
-        username: network_connectivity
-      - name: network_policy
-        password: ((network_policy_database_password))
-        username: network_policy
-      - name: routing-api
-        password: ((routing_api_database_password))
-        username: routing-api
       - name: uaa
         password: ((uaa_database_password))
         username: uaa
       - name: locket
         password: ((locket_database_password))
         username: locket
-      - name: credhub
-        password: ((credhub_database_password))
-        username: credhub
       tls:
         galera: ((galera_server_certificate))
         server: ((mysql_server_certificate))
@@ -486,25 +453,6 @@ instance_groups:
       logging:
         format:
           timestamp: "rfc3339"
-  - name: silk-controller
-    release: silk
-    properties:
-      ca_cert: ((silk_controller.ca))
-      server_cert: ((silk_controller.certificate))
-      server_key: ((silk_controller.private_key))
-      database:
-        type: mysql
-        username: network_connectivity
-        password: ((network_connectivity_database_password))
-        host: sql-db.service.cf.internal
-        port: 3306
-        name: network_connectivity
-        ca_cert: "((mysql_server_certificate.ca))"
-        require_ssl: true
-      silk_daemon:
-        ca_cert: ((silk_daemon.ca))
-        client_cert: ((silk_daemon.certificate))
-        client_key: ((silk_daemon.private_key))
   - name: locket
     release: diego
     properties:
@@ -635,10 +583,6 @@ instance_groups:
             authorities: scim.userids
             authorized-grant-types: client_credentials
             secret: "((uaa_clients_cloud_controller_username_lookup_secret))"
-          credhub_admin_client:
-            authorities: credhub.read,credhub.write
-            authorized-grant-types: client_credentials
-            secret: ((credhub_admin_client_secret))
           doppler:
             authorities: uaa.resource
             override: true
@@ -655,22 +599,10 @@ instance_groups:
             redirect-uri: "https://uaa.((system_domain))/login"
             scope: openid,cloud_controller.read,cloud_controller.write,cloud_controller.admin
             secret: "((uaa_clients_ssh-proxy_secret))"
-          routing_api_client:
-            authorities: routing.routes.write,routing.routes.read,routing.router_groups.read
-            authorized-grant-types: client_credentials
-            secret: "((uaa_clients_routing_api_client_secret))"
-          network-policy:
-            authorities: uaa.resource,cloud_controller.admin_read_only
-            authorized-grant-types: client_credentials
-            secret: ((uaa_clients_network_policy_secret))
           tcp_emitter:
             authorities: routing.routes.write,routing.routes.read
             authorized-grant-types: client_credentials
             secret: "((uaa_clients_tcp_emitter_secret))"
-          tcp_router:
-            authorities: routing.routes.read
-            authorized-grant-types: client_credentials
-            secret: "((uaa_clients_tcp_router_secret))"
         ca_certs:
         - "((mysql_server_certificate.ca))"
       uaadb:
@@ -781,10 +713,6 @@ instance_groups:
       - "((system_domain))"
       app_ssh:
         host_key_fingerprint: "((diego_ssh_proxy_host_key.public_key_fingerprint))"
-      routing_api: &routing_api
-        enabled: true
-      credhub_api:
-        ca_cert: ((credhub_tls.ca))
       ssl:
         skip_cert_verify: true
       uaa:
@@ -858,6 +786,7 @@ instance_groups:
           package: binary-buildpack-cflinuxfs3
         db_encryption_key: "((cc_db_encryption_key))"
         database_encryption: &cc-database-encryption
+          skip_validation: true
           current_key_label: "encryption_key_0"
           keys:
             encryption_key_0: "((cc_db_encryption_key))"
@@ -960,62 +889,6 @@ instance_groups:
         format:
           timestamp: "rfc3339"
       loggregator: *diego_loggregator_client_properties
-  - name: routing-api
-    release: routing
-    properties:
-      routing_api:
-        enabled_api_endpoints: "both"
-        mtls_ca: "((routing_api_tls_client.ca))"
-        mtls_server_cert: "((routing_api_tls.certificate))"
-        mtls_server_key: "((routing_api_tls.private_key))"
-        mtls_client_cert: "((routing_api_tls_client.certificate))"
-        mtls_client_key: "((routing_api_tls_client.private_key))"
-        skip_consul_lock: true
-        system_domain: "((system_domain))"
-        router_groups:
-        - name: default-tcp
-          type: tcp
-          reservable_ports: 1024-1033
-        sqldb:
-          host: sql-db.service.cf.internal
-          type: mysql
-          port: 3306
-          schema: routing-api
-          username: routing-api
-          password: "((routing_api_database_password))"
-          ca_cert: "((mysql_server_certificate.ca))"
-        locket:
-          api_location: "locket.service.cf.internal:8891"
-          ca_cert: "((diego_locket_client.ca))"
-          client_cert: "((diego_locket_client.certificate))"
-          client_key: "((diego_locket_client.private_key))"
-      uaa:
-        ca_cert: "((uaa_ssl.ca))"
-        tls_port: 8443
-  - name: policy-server
-    release: cf-networking
-    properties:
-      uaa_client_secret: ((uaa_clients_network_policy_secret))
-      uaa_ca: ((uaa_ssl.ca))
-      enable_space_developer_self_service: true
-      enable_tls: true
-      database:
-        type: mysql
-        username: network_policy
-        password: ((network_policy_database_password))
-        host: sql-db.service.cf.internal
-        port: 3306
-        name: network_policy
-        ca_cert: "((mysql_server_certificate.ca))"
-        require_ssl: true
-      server_cert: ((network_policy_server_external.certificate))
-      server_key: ((network_policy_server_external.private_key))
-  - name: policy-server-internal
-    release: cf-networking
-    properties:
-      ca_cert: ((network_policy_server.ca))
-      server_cert: ((network_policy_server.certificate))
-      server_key: ((network_policy_server.private_key))
   - name: cc_uploader
     release: capi
     properties:
@@ -1068,7 +941,6 @@ instance_groups:
         mutual_tls: *cc_mutual_tls
       ccdb: *ccdb
       system_domain: "((system_domain))"
-      routing_api: *routing_api
       ssl:
         skip_cert_verify: true
       uaa:
@@ -1141,7 +1013,6 @@ instance_groups:
         mutual_tls: *cc_mutual_tls
       ccdb: *ccdb
       system_domain: "((system_domain))"
-      routing_api: *routing_api
       ssl:
         skip_cert_verify: true
       uaa:
@@ -1272,7 +1143,6 @@ instance_groups:
           ((diego_instance_identity_ca.ca))
           ((cc_tls.ca))
           ((uaa_ssl.ca))
-          ((network_policy_server_external.ca))
         backends:
           cert_chain: ((gorouter_backend_tls.certificate))
           private_key: ((gorouter_backend_tls.private_key))
@@ -1282,8 +1152,6 @@ instance_groups:
         route_services_secret: "((router_route_services_secret))"
         tracing:
           enable_zipkin: true
-      routing_api:
-        enabled: true
       uaa:
         clients:
           gorouter:
@@ -1291,40 +1159,6 @@ instance_groups:
         ca_cert: "((uaa_ssl.ca))"
         ssl:
           port: 8443
-  - name: loggr-udp-forwarder
-    release: loggregator-agent
-    properties:
-      loggregator:
-        tls:
-          ca: "((loggregator_tls_agent.ca))"
-          cert: "((loggregator_tls_agent.certificate))"
-          key: "((loggregator_tls_agent.private_key))"
-      metrics:
-        ca_cert: "((loggr_udp_forwarder_tls.ca))"
-        cert: "((loggr_udp_forwarder_tls.certificate))"
-        key: "((loggr_udp_forwarder_tls.private_key))"
-        server_name: loggr_udp_forwarder_metrics
-- name: tcp-router
-  azs:
-  - z1
-  - z2
-  instances: 2
-  vm_type: minimal
-  stemcell: default
-  vm_extensions:
-  - cf-tcp-router-network-properties
-  networks:
-  - name: default
-  jobs:
-  - name: tcp_router
-    release: routing
-    properties:
-      tcp_router:
-        oauth_secret: "((uaa_clients_tcp_router_secret))"
-        router_group: default-tcp
-      uaa:
-        ca_cert: "((uaa_ssl.ca))"
-        tls_port: 8443
   - name: loggr-udp-forwarder
     release: loggregator-agent
     properties:
@@ -1446,7 +1280,6 @@ instance_groups:
       cflinuxfs3-rootfs:
         trusted_certs:
         - ((diego_instance_identity_ca.ca))
-        - ((credhub_tls.ca))
         - ((uaa_ssl.ca))
   - name: garden
     release: garden-runc
@@ -1459,9 +1292,6 @@ instance_groups:
         destroy_containers_on_start: true
         deny_networks:
         - 0.0.0.0/0
-        network_plugin: /var/vcap/packages/runc-cni/bin/garden-external-networker
-        network_plugin_extra_args:
-        - --configFile=/var/vcap/jobs/garden-cni/config/adapter.json
       logging:
         format:
           timestamp: "rfc3339"
@@ -1489,7 +1319,6 @@ instance_groups:
           - ssh-proxy.service.cf.internal
         trusted_ca_certificates:
         - ((diego_instance_identity_ca.ca))
-        - ((credhub_tls.ca))
         - ((uaa_ssl.ca))
       enable_consul_service_registration: false
       enable_declarative_healthcheck: true
@@ -1526,30 +1355,6 @@ instance_groups:
       logging:
         format:
           timestamp: "rfc3339"
-  - name: garden-cni
-    release: cf-networking
-    properties:
-      cni_plugin_dir: /var/vcap/packages/silk-cni/bin
-      cni_config_dir: /var/vcap/jobs/silk-cni/config/cni
-  - name: netmon
-    release: silk
-  - name: vxlan-policy-agent
-    release: silk
-    properties:
-      ca_cert: ((network_policy_client.ca))
-      client_cert: ((network_policy_client.certificate))
-      client_key: ((network_policy_client.private_key))
-  - name: silk-daemon
-    release: silk
-    properties:
-      ca_cert: ((silk_daemon.ca))
-      client_cert: ((silk_daemon.certificate))
-      client_key: ((silk_daemon.private_key))
-  - name: silk-cni
-    release: silk
-    properties:
-      dns_servers:
-      - 169.254.0.2
   - name: loggr-udp-forwarder
     release: loggregator-agent
     properties:
@@ -1661,59 +1466,6 @@ instance_groups:
           uris:
           - log-stream.((system_domain))
           - "*.log-stream.((system_domain))"
-- name: credhub
-  azs:
-  - z1
-  - z2
-  instances: 2
-  networks:
-  - name: default
-  stemcell: default
-  vm_type: minimal
-  jobs:
-  - name: credhub
-    properties:
-      credhub:
-        authentication:
-          mutual_tls:
-            trusted_cas:
-            - ((diego_instance_identity_ca.ca))
-          uaa:
-            ca_certs:
-            - ((uaa_ssl.ca))
-            url: https://uaa.service.cf.internal:8443
-        authorization:
-          acls:
-            enabled: true
-          permissions:
-          - path: /*
-            actors: ["uaa-client:credhub_admin_client"]
-            operations: [read, write, delete, read_acl, write_acl]
-          - path: /*
-            actors: ["uaa-client:cc_service_key_client"]
-            operations: [read]
-        ca_certificate: |
-          ((credhub_tls.ca))
-        data_storage:
-          database: credhub
-          host: sql-db.service.cf.internal
-          password: ((credhub_database_password))
-          port: 3306
-          type: mysql
-          username: credhub
-          tls_ca: "((mysql_server_certificate.ca))"
-        encryption:
-          keys:
-          - active: true
-            key_properties:
-              encryption_password: ((credhub_encryption_password))
-            provider_name: internal-provider
-          providers:
-          - name: internal-provider
-            type: internal
-        internal_url: https://credhub.service.cf.internal
-        tls: ((credhub_tls))
-    release: credhub
 - name: rotate-cc-database-key
   azs:
   - z1
@@ -1753,68 +1505,13 @@ variables:
   type: password
 - name: cc_database_password
   type: password
-- name: credhub_database_password
-  type: password
 - name: diego_database_password
   type: password
 - name: uaa_database_password
   type: password
-- name: routing_api_database_password
-  type: password
-- name: network_policy_database_password
-  type: password
 - name: network_connectivity_database_password
   type: password
 - name: uaa_default_encryption_passphrase
-  type: password
-- name: silk_ca
-  type: certificate
-  options:
-    is_ca: true
-    common_name: silk-ca
-- name: silk_controller
-  type: certificate
-  options:
-    ca: silk_ca
-    common_name: silk-controller.service.cf.internal
-    extended_key_usage:
-    - server_auth
-- name: silk_daemon
-  type: certificate
-  options:
-    ca: silk_ca
-    common_name: silk-daemon
-    extended_key_usage:
-    - client_auth
-- name: network_policy_ca
-  type: certificate
-  options:
-    is_ca: true
-    common_name: networkPolicyCA
-- name: network_policy_server_external
-  type: certificate
-  options:
-    ca: network_policy_ca
-    common_name: "api.((system_domain))"
-    alternative_names:
-    - "api.((system_domain))"
-    extended_key_usage:
-    - server_auth
-- name: network_policy_server
-  type: certificate
-  options:
-    ca: network_policy_ca
-    common_name: policy-server.service.cf.internal
-    extended_key_usage:
-    - server_auth
-- name: network_policy_client
-  type: certificate
-  options:
-    ca: network_policy_ca
-    common_name: clientName
-    extended_key_usage:
-    - client_auth
-- name: uaa_clients_routing_api_client_secret
   type: password
 - name: uaa_clients_tcp_emitter_secret
   type: password
@@ -1851,10 +1548,6 @@ variables:
 - name: uaa_clients_tcp_router_secret
   type: password
 - name: diego_bbs_encryption_keys_passphrase
-  type: password
-- name: credhub_encryption_password
-  type: password
-- name: credhub_admin_client_secret
   type: password
 - name: diego_ssh_proxy_host_key
   type: ssh
@@ -2087,25 +1780,6 @@ variables:
     alternative_names:
     - "((system_domain))"
     - "*.((system_domain))"
-- name: routing_api_ca
-  type: certificate
-  options:
-    common_name: routing_api
-    is_ca: true
-- name: routing_api_tls
-  type: certificate
-  options:
-    ca: routing_api_ca
-    common_name: routing-api.service.cf.internal
-    extended_key_usage:
-      - server_auth
-- name: routing_api_tls_client
-  type: certificate
-  options:
-    ca: routing_api_ca
-    common_name: routing-api-client
-    extended_key_usage:
-      - client_auth
 - name: uaa_ca
   type: certificate
   options:
@@ -2199,19 +1873,6 @@ variables:
     common_name: gorouter_backend_tls
     alternative_names:
     - gorouter.service.cf.internal
-- name: credhub_ca
-  type: certificate
-  options:
-    common_name: credhubServerCa
-    is_ca: true
-- name: credhub_tls
-  type: certificate
-  options:
-    ca: credhub_ca
-    common_name: credhub.((system_domain))
-    alternative_names:
-    - credhub.service.cf.internal
-    - credhub.((system_domain))
 - name: ssh_proxy_backends_tls
   type: certificate
   options:
@@ -2354,10 +2015,6 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/capi-release?v=1.91.0
   version: 1.91.0
   sha1: a1c6175eaf98e27d70562976cf82d09dec493e53
-- name: cf-networking
-  url: https://bosh.io/d/github.com/cloudfoundry/cf-networking-release?v=2.28.0
-  version: 2.28.0
-  sha1: 683397ede8132bd343f83a4d8c85e943537151a8
 - name: cf-smoke-tests
   url: https://bosh.io/d/github.com/cloudfoundry/cf-smoke-tests-release?v=40.0.127
   version: 40.0.127
@@ -2370,10 +2027,6 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/cflinuxfs3-release?v=0.167.0
   version: 0.167.0
   sha1: 83ef2b1cf57a3c66d60b62828991506f71cc41f9
-- name: credhub
-  url: https://bosh.io/d/github.com/pivotal-cf/credhub-release?v=2.5.11
-  version: 2.5.11
-  sha1: f1810c1e662a1c76f40911cffd1d159204c9a661
 - name: diego
   url: https://bosh.io/d/github.com/cloudfoundry/diego-release?v=2.44.0
   version: 2.44.0
@@ -2434,10 +2087,6 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/ruby-buildpack-release?v=1.8.11
   version: 1.8.11
   sha1: 8ef27c470dcaef844ec606d0b200947befd566da
-- name: silk
-  url: https://bosh.io/d/github.com/cloudfoundry/silk-release?v=2.28.0
-  version: 2.28.0
-  sha1: 43bad37b29a5eb16ac0ce79bc6045c41479d761b
 - name: staticfile-buildpack
   url: https://bosh.io/d/github.com/cloudfoundry/staticfile-buildpack-release?v=1.5.4
   version: 1.5.4
@@ -2469,4 +2118,4 @@ releases:
 stemcells:
 - alias: default
   os: ubuntu-xenial
-  version: "621.59"
+  version: "621.71"
