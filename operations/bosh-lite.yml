@@ -1,10 +1,10 @@
 ---
 # --- Set Router Static IP ---
-- type: replace
-  path: /instance_groups/name=router/networks
-  value:
-  - name: default
-    static_ips: [10.244.0.34]
+# - type: replace
+#   path: /instance_groups/name=router/networks
+#   value:
+#   - name: default
+#     static_ips: [10.244.0.34]
 
 # --- Add Bosh Lite Security Groups ---
 - type: replace
@@ -88,9 +88,6 @@
   path: /instance_groups/name=router/instances
   value: 1
 - type: replace
-  path: /instance_groups/name=tcp-router/instances
-  value: 1
-- type: replace
   path: /instance_groups/name=api/instances
   value: 1
 - type: replace
@@ -101,9 +98,6 @@
   value: 1
 - type: replace
   path: /instance_groups/name=log-api/instances
-  value: 1
-- type: replace
-  path: /instance_groups/name=credhub/instances
   value: 1
 
 # ----- Reduce default app memory to 256M ------

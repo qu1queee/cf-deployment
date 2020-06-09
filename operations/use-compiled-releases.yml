@@ -49,16 +49,6 @@
     url: https://storage.googleapis.com/cf-deployment-compiled-releases/cf-cli-1.26.0-ubuntu-xenial-621.5-20200408-202054-787606312.tgz
     version: 1.26.0
 - type: replace
-  path: /releases/name=cf-networking
-  value:
-    name: cf-networking
-    sha1: 9d8558ca209961d6bd09d4761574cfdc8aa7de2b
-    stemcell:
-      os: ubuntu-xenial
-      version: "621.5"
-    url: https://storage.googleapis.com/cf-deployment-compiled-releases/cf-networking-2.29.0-ubuntu-xenial-621.5-20200422-180710-503402693.tgz
-    version: 2.29.0
-- type: replace
   path: /releases/name=cf-smoke-tests
   value:
     name: cf-smoke-tests
@@ -78,16 +68,6 @@
       version: "621.5"
     url: https://storage.googleapis.com/cf-deployment-compiled-releases/cflinuxfs3-0.178.0-ubuntu-xenial-621.5-20200429-045003-489640067.tgz
     version: 0.178.0
-- type: replace
-  path: /releases/name=credhub
-  value:
-    name: credhub
-    sha1: 13258b170926c8cd203a1de48485645f6d993568
-    stemcell:
-      os: ubuntu-xenial
-      version: "621.5"
-    url: https://storage.googleapis.com/cf-deployment-compiled-releases/credhub-2.6.0-ubuntu-xenial-621.5-20200417-223550-267529087.tgz
-    version: 2.6.0
 - type: replace
   path: /releases/name=diego
   value:
@@ -258,16 +238,6 @@
       version: "621.5"
     url: https://storage.googleapis.com/cf-deployment-compiled-releases/ruby-buildpack-1.8.17-ubuntu-xenial-621.5-20200428-164923-287083269.tgz
     version: 1.8.17
-- type: replace
-  path: /releases/name=silk
-  value:
-    name: silk
-    sha1: 7525f16814a83640699f8f11d84a4b109010c6f7
-    stemcell:
-      os: ubuntu-xenial
-      version: "621.5"
-    url: https://storage.googleapis.com/cf-deployment-compiled-releases/silk-2.29.0-ubuntu-xenial-621.5-20200422-181233-781447053.tgz
-    version: 2.29.0
 - type: replace
   path: /releases/name=staticfile-buildpack
   value:

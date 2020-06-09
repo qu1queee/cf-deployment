@@ -17,17 +17,13 @@
 - type: remove
   path: /variables/name=cf_mysql_proxy_api_password
 - type: remove
-  path: /variables/name=network_policy_database_password
+  path: /variables/name=network_policy_database_password?
 - type: remove
   path: /variables/name=network_connectivity_database_password
-- type: remove
-  path: /variables/name=routing_api_database_password
 - type: remove
   path: /variables/name=locket_database_password
 - type: remove
   path: /variables/name=cc_database_password
-- type: remove
-  path: /variables/name=credhub_database_password
 - type: remove
   path: /variables/name=diego_database_password
 - type: remove
@@ -61,9 +57,6 @@
   value: ((external_uaa_database_username))
 - type: remove
   path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa?/ca_certs
-- type: replace
-  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaadb/tls?
-  value: disabled
 
 - type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/ccdb/db_scheme
@@ -83,8 +76,6 @@
 - type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/ccdb/roles/name=cloud_controller/name
   value: &external_cc_database_username "((external_cc_database_username))"
-- type: remove
-  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/ccdb/ca_cert?
 
 - type: replace
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/ccdb/db_scheme
@@ -104,8 +95,6 @@
 - type: replace
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/ccdb/roles/name=cloud_controller/name
   value: *external_cc_database_username
-- type: remove
-  path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/ccdb/ca_cert?
 
 - type: replace
   path: /instance_groups/name=scheduler/jobs/name=cloud_controller_clock/properties/ccdb/db_scheme
@@ -125,9 +114,6 @@
 - type: replace
   path: /instance_groups/name=scheduler/jobs/name=cloud_controller_clock/properties/ccdb/roles/name=cloud_controller/name
   value: *external_cc_database_username
-- type: remove
-  path: /instance_groups/name=scheduler/jobs/name=cloud_controller_clock/properties/ccdb/ca_cert?
-
 - type: replace
   path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/sql/db_driver
   value: ((external_database_type))
@@ -146,77 +132,6 @@
 - type: replace
   path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/sql/db_username
   value: ((external_bbs_database_username))
-- type: remove
-  path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/sql/ca_cert?
-- type: remove
-  path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/sql/require_ssl?
-
-- type: replace
-  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/sqldb/type
-  value: ((external_database_type))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/sqldb/port
-  value: ((external_database_port))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/sqldb/schema
-  value: ((external_routing_api_database_name))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/sqldb/host?
-  value: ((external_routing_api_database_address))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/sqldb/password
-  value: ((external_routing_api_database_password))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/sqldb/username
-  value: ((external_routing_api_database_username))
-- type: remove
-  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/sqldb/ca_cert?
-
-- type: replace
-  path: /instance_groups/name=api/jobs/name=policy-server/properties/database/type
-  value: ((external_database_type))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=policy-server/properties/database/username
-  value: ((external_policy_server_database_username))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=policy-server/properties/database/password
-  value: ((external_policy_server_database_password))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=policy-server/properties/database/host
-  value: ((external_policy_server_database_address))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=policy-server/properties/database/port
-  value: ((external_database_port))
-- type: replace
-  path: /instance_groups/name=api/jobs/name=policy-server/properties/database/name
-  value: ((external_policy_server_database_name))
-- type: remove
-  path: /instance_groups/name=api/jobs/name=policy-server/properties/database/ca_cert?
-- type: remove
-  path: /instance_groups/name=api/jobs/name=policy-server/properties/database/require_ssl?
-
-- type: replace
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/properties/database/type
-  value: ((external_database_type))
-- type: replace
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/properties/database/username
-  value: ((external_silk_controller_database_username))
-- type: replace
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/properties/database/password
-  value: ((external_silk_controller_database_password))
-- type: replace
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/properties/database/host
-  value: ((external_silk_controller_database_address))
-- type: replace
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/properties/database/port
-  value: ((external_database_port))
-- type: replace
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/properties/database/name
-  value: ((external_silk_controller_database_name))
-- type: remove
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/properties/database/ca_cert?
-- type: remove
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/properties/database/require_ssl?
 
 - type: replace
   path: /instance_groups/name=diego-api/jobs/name=locket/properties/diego/locket/sql/db_driver
@@ -236,34 +151,6 @@
 - type: replace
   path: /instance_groups/name=diego-api/jobs/name=locket/properties/diego/locket/sql/db_username
   value: ((external_locket_database_username))
-- type: remove
-  path: /instance_groups/name=diego-api/jobs/name=locket/properties/diego/locket/sql/ca_cert?
-- type: remove
-  path: /instance_groups/name=diego-api/jobs/name=locket/properties/diego/locket/sql/require_ssl?
-
-- type: replace
-  path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/type
-  value: ((external_database_type))
-- type: replace
-  path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/username
-  value: ((external_credhub_database_username))
-- type: replace
-  path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/password
-  value: ((external_credhub_database_password))
-- type: replace
-  path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/host
-  value: ((external_credhub_database_address))
-- type: replace
-  path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/port
-  value: ((external_database_port))
-- type: replace
-  path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/database
-  value: ((external_credhub_database_name))
-- type: remove
-  path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/tls_ca?
-- type: replace
-  path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/require_tls?
-  value: false
 
 # nil out database links
 - type: replace
@@ -277,12 +164,6 @@
   value: {database: nil}
 - type: replace
   path: /instance_groups/name=scheduler/jobs/name=cloud_controller_clock/consumes?
-  value: {database: nil}
-- type: replace
-  path: /instance_groups/name=diego-api/jobs/name=silk-controller/consumes?
-  value: {database: nil}
-- type: replace
-  path: /instance_groups/name=api/jobs/name=policy-server/consumes?
   value: {database: nil}
 - type: replace
   path: /instance_groups/name=scheduler/jobs/name=cc_deployment_updater/properties/ccdb/db_scheme
@@ -302,3 +183,164 @@
 - type: replace
   path: /instance_groups/name=scheduler/jobs/name=cc_deployment_updater/properties/ccdb/roles/name=cloud_controller/name
   value: "((external_cc_database_username))"
+
+
+
+- type: remove
+  path: /instance_groups/name=api/jobs/name=policy-server?
+- type: remove
+  path: /instance_groups/name=api/jobs/name=policy-server-internal?
+- type: remove
+  path: /instance_groups/name=api/jobs/name=route_registrar/properties/route_registrar/routes/name=policy-server?
+- type: remove
+  path: /instance_groups/name=diego-api/jobs/name=silk-controller?
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaadb/tls?
+  value: "enabled_skip_all_validation"
+
+
+- type: replace
+  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/ccdb/ca_cert?
+  value: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDzCCAfegAwIBAgIJANEH58y2/kzHMA0GCSqGSIb3DQEBCwUAMB4xHDAaBgNV
+    BAMME0lCTSBDbG91ZCBEYXRhYmFzZXMwHhcNMTgwNjI1MTQyOTAwWhcNMjgwNjIy
+    MTQyOTAwWjAeMRwwGgYDVQQDDBNJQk0gQ2xvdWQgRGF0YWJhc2VzMIIBIjANBgkq
+    hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8lpaQGzcFdGqeMlmqjffMPpIQhqpd8qJ
+    Pr3bIkrXJbTcJJ9uIckSUcCjw4Z/rSg8nnT13SCcOl+1to+7kdMiU8qOWKiceYZ5
+    y+yZYfCkGaiZVfazQBm45zBtFWv+AB/8hfCTdNF7VY4spaA3oBE2aS7OANNSRZSK
+    pwy24IUgUcILJW+mcvW80Vx+GXRfD9Ytt6PRJgBhYuUBpgzvngmCMGBn+l2KNiSf
+    weovYDCD6Vngl2+6W9QFAFtWXWgF3iDQD5nl/n4mripMSX6UG/n6657u7TDdgkvA
+    1eKI2FLzYKpoKBe5rcnrM7nHgNc/nCdEs5JecHb1dHv1QfPm6pzIxwIDAQABo1Aw
+    TjAdBgNVHQ4EFgQUK3+XZo1wyKs+DEoYXbHruwSpXjgwHwYDVR0jBBgwFoAUK3+X
+    Zo1wyKs+DEoYXbHruwSpXjgwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOC
+    AQEAJf5dvlzUpqaix26qJEuqFG0IP57QQI5TCRJ6Xt/supRHo63eDvKw8zR7tlWQ
+    lV5P0N2xwuSl9ZqAJt7/k/3ZeB+nYwPoyO3KvKvATunRvlPBn4FWVXeaPsG+7fhS
+    qsejmkyonYw77HRzGOzJH4Zg8UN6mfpbaWSsyaExvqknCp9SoTQP3D67AzWqb1zY
+    doqqgGIZ2nxCkp5/FXxF/TMb55vteTQwfgBy60jVVkbF7eVOWCv0KaNHPF5hrqbN
+    i+3XjJ7/peF3xMvTMoy35DcT3E2ZeSVjouZs15O90kI3k2daS2OHJABW0vSj4nLz
+    +PQzp/B9cQmOO8dCe049Q3oaUA==
+    -----END CERTIFICATE-----
+
+- type: replace
+  path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/ccdb/ca_cert?
+  value: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDzCCAfegAwIBAgIJANEH58y2/kzHMA0GCSqGSIb3DQEBCwUAMB4xHDAaBgNV
+    BAMME0lCTSBDbG91ZCBEYXRhYmFzZXMwHhcNMTgwNjI1MTQyOTAwWhcNMjgwNjIy
+    MTQyOTAwWjAeMRwwGgYDVQQDDBNJQk0gQ2xvdWQgRGF0YWJhc2VzMIIBIjANBgkq
+    hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8lpaQGzcFdGqeMlmqjffMPpIQhqpd8qJ
+    Pr3bIkrXJbTcJJ9uIckSUcCjw4Z/rSg8nnT13SCcOl+1to+7kdMiU8qOWKiceYZ5
+    y+yZYfCkGaiZVfazQBm45zBtFWv+AB/8hfCTdNF7VY4spaA3oBE2aS7OANNSRZSK
+    pwy24IUgUcILJW+mcvW80Vx+GXRfD9Ytt6PRJgBhYuUBpgzvngmCMGBn+l2KNiSf
+    weovYDCD6Vngl2+6W9QFAFtWXWgF3iDQD5nl/n4mripMSX6UG/n6657u7TDdgkvA
+    1eKI2FLzYKpoKBe5rcnrM7nHgNc/nCdEs5JecHb1dHv1QfPm6pzIxwIDAQABo1Aw
+    TjAdBgNVHQ4EFgQUK3+XZo1wyKs+DEoYXbHruwSpXjgwHwYDVR0jBBgwFoAUK3+X
+    Zo1wyKs+DEoYXbHruwSpXjgwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOC
+    AQEAJf5dvlzUpqaix26qJEuqFG0IP57QQI5TCRJ6Xt/supRHo63eDvKw8zR7tlWQ
+    lV5P0N2xwuSl9ZqAJt7/k/3ZeB+nYwPoyO3KvKvATunRvlPBn4FWVXeaPsG+7fhS
+    qsejmkyonYw77HRzGOzJH4Zg8UN6mfpbaWSsyaExvqknCp9SoTQP3D67AzWqb1zY
+    doqqgGIZ2nxCkp5/FXxF/TMb55vteTQwfgBy60jVVkbF7eVOWCv0KaNHPF5hrqbN
+    i+3XjJ7/peF3xMvTMoy35DcT3E2ZeSVjouZs15O90kI3k2daS2OHJABW0vSj4nLz
+    +PQzp/B9cQmOO8dCe049Q3oaUA==
+    -----END CERTIFICATE-----
+
+- type: replace
+  path: /instance_groups/name=scheduler/jobs/name=cloud_controller_clock/properties/ccdb/ca_cert?
+  value: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDzCCAfegAwIBAgIJANEH58y2/kzHMA0GCSqGSIb3DQEBCwUAMB4xHDAaBgNV
+    BAMME0lCTSBDbG91ZCBEYXRhYmFzZXMwHhcNMTgwNjI1MTQyOTAwWhcNMjgwNjIy
+    MTQyOTAwWjAeMRwwGgYDVQQDDBNJQk0gQ2xvdWQgRGF0YWJhc2VzMIIBIjANBgkq
+    hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8lpaQGzcFdGqeMlmqjffMPpIQhqpd8qJ
+    Pr3bIkrXJbTcJJ9uIckSUcCjw4Z/rSg8nnT13SCcOl+1to+7kdMiU8qOWKiceYZ5
+    y+yZYfCkGaiZVfazQBm45zBtFWv+AB/8hfCTdNF7VY4spaA3oBE2aS7OANNSRZSK
+    pwy24IUgUcILJW+mcvW80Vx+GXRfD9Ytt6PRJgBhYuUBpgzvngmCMGBn+l2KNiSf
+    weovYDCD6Vngl2+6W9QFAFtWXWgF3iDQD5nl/n4mripMSX6UG/n6657u7TDdgkvA
+    1eKI2FLzYKpoKBe5rcnrM7nHgNc/nCdEs5JecHb1dHv1QfPm6pzIxwIDAQABo1Aw
+    TjAdBgNVHQ4EFgQUK3+XZo1wyKs+DEoYXbHruwSpXjgwHwYDVR0jBBgwFoAUK3+X
+    Zo1wyKs+DEoYXbHruwSpXjgwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOC
+    AQEAJf5dvlzUpqaix26qJEuqFG0IP57QQI5TCRJ6Xt/supRHo63eDvKw8zR7tlWQ
+    lV5P0N2xwuSl9ZqAJt7/k/3ZeB+nYwPoyO3KvKvATunRvlPBn4FWVXeaPsG+7fhS
+    qsejmkyonYw77HRzGOzJH4Zg8UN6mfpbaWSsyaExvqknCp9SoTQP3D67AzWqb1zY
+    doqqgGIZ2nxCkp5/FXxF/TMb55vteTQwfgBy60jVVkbF7eVOWCv0KaNHPF5hrqbN
+    i+3XjJ7/peF3xMvTMoy35DcT3E2ZeSVjouZs15O90kI3k2daS2OHJABW0vSj4nLz
+    +PQzp/B9cQmOO8dCe049Q3oaUA==
+    -----END CERTIFICATE-----
+
+- type: replace
+  path: /instance_groups/name=scheduler/jobs/name=cc_deployment_updater/properties/ccdb/ca_cert?
+  value: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDzCCAfegAwIBAgIJANEH58y2/kzHMA0GCSqGSIb3DQEBCwUAMB4xHDAaBgNV
+    BAMME0lCTSBDbG91ZCBEYXRhYmFzZXMwHhcNMTgwNjI1MTQyOTAwWhcNMjgwNjIy
+    MTQyOTAwWjAeMRwwGgYDVQQDDBNJQk0gQ2xvdWQgRGF0YWJhc2VzMIIBIjANBgkq
+    hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8lpaQGzcFdGqeMlmqjffMPpIQhqpd8qJ
+    Pr3bIkrXJbTcJJ9uIckSUcCjw4Z/rSg8nnT13SCcOl+1to+7kdMiU8qOWKiceYZ5
+    y+yZYfCkGaiZVfazQBm45zBtFWv+AB/8hfCTdNF7VY4spaA3oBE2aS7OANNSRZSK
+    pwy24IUgUcILJW+mcvW80Vx+GXRfD9Ytt6PRJgBhYuUBpgzvngmCMGBn+l2KNiSf
+    weovYDCD6Vngl2+6W9QFAFtWXWgF3iDQD5nl/n4mripMSX6UG/n6657u7TDdgkvA
+    1eKI2FLzYKpoKBe5rcnrM7nHgNc/nCdEs5JecHb1dHv1QfPm6pzIxwIDAQABo1Aw
+    TjAdBgNVHQ4EFgQUK3+XZo1wyKs+DEoYXbHruwSpXjgwHwYDVR0jBBgwFoAUK3+X
+    Zo1wyKs+DEoYXbHruwSpXjgwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOC
+    AQEAJf5dvlzUpqaix26qJEuqFG0IP57QQI5TCRJ6Xt/supRHo63eDvKw8zR7tlWQ
+    lV5P0N2xwuSl9ZqAJt7/k/3ZeB+nYwPoyO3KvKvATunRvlPBn4FWVXeaPsG+7fhS
+    qsejmkyonYw77HRzGOzJH4Zg8UN6mfpbaWSsyaExvqknCp9SoTQP3D67AzWqb1zY
+    doqqgGIZ2nxCkp5/FXxF/TMb55vteTQwfgBy60jVVkbF7eVOWCv0KaNHPF5hrqbN
+    i+3XjJ7/peF3xMvTMoy35DcT3E2ZeSVjouZs15O90kI3k2daS2OHJABW0vSj4nLz
+    +PQzp/B9cQmOO8dCe049Q3oaUA==
+    -----END CERTIFICATE-----
+
+- type: replace
+  path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/sql/ca_cert?
+  value: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDzCCAfegAwIBAgIJANEH58y2/kzHMA0GCSqGSIb3DQEBCwUAMB4xHDAaBgNV
+    BAMME0lCTSBDbG91ZCBEYXRhYmFzZXMwHhcNMTgwNjI1MTQyOTAwWhcNMjgwNjIy
+    MTQyOTAwWjAeMRwwGgYDVQQDDBNJQk0gQ2xvdWQgRGF0YWJhc2VzMIIBIjANBgkq
+    hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8lpaQGzcFdGqeMlmqjffMPpIQhqpd8qJ
+    Pr3bIkrXJbTcJJ9uIckSUcCjw4Z/rSg8nnT13SCcOl+1to+7kdMiU8qOWKiceYZ5
+    y+yZYfCkGaiZVfazQBm45zBtFWv+AB/8hfCTdNF7VY4spaA3oBE2aS7OANNSRZSK
+    pwy24IUgUcILJW+mcvW80Vx+GXRfD9Ytt6PRJgBhYuUBpgzvngmCMGBn+l2KNiSf
+    weovYDCD6Vngl2+6W9QFAFtWXWgF3iDQD5nl/n4mripMSX6UG/n6657u7TDdgkvA
+    1eKI2FLzYKpoKBe5rcnrM7nHgNc/nCdEs5JecHb1dHv1QfPm6pzIxwIDAQABo1Aw
+    TjAdBgNVHQ4EFgQUK3+XZo1wyKs+DEoYXbHruwSpXjgwHwYDVR0jBBgwFoAUK3+X
+    Zo1wyKs+DEoYXbHruwSpXjgwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOC
+    AQEAJf5dvlzUpqaix26qJEuqFG0IP57QQI5TCRJ6Xt/supRHo63eDvKw8zR7tlWQ
+    lV5P0N2xwuSl9ZqAJt7/k/3ZeB+nYwPoyO3KvKvATunRvlPBn4FWVXeaPsG+7fhS
+    qsejmkyonYw77HRzGOzJH4Zg8UN6mfpbaWSsyaExvqknCp9SoTQP3D67AzWqb1zY
+    doqqgGIZ2nxCkp5/FXxF/TMb55vteTQwfgBy60jVVkbF7eVOWCv0KaNHPF5hrqbN
+    i+3XjJ7/peF3xMvTMoy35DcT3E2ZeSVjouZs15O90kI3k2daS2OHJABW0vSj4nLz
+    +PQzp/B9cQmOO8dCe049Q3oaUA==
+    -----END CERTIFICATE-----
+
+- type: replace
+  path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/sql/require_ssl?
+  value: true
+
+- type: replace
+  path: /instance_groups/name=diego-api/jobs/name=locket/properties/diego/locket/sql/ca_cert?
+  value: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDzCCAfegAwIBAgIJANEH58y2/kzHMA0GCSqGSIb3DQEBCwUAMB4xHDAaBgNV
+    BAMME0lCTSBDbG91ZCBEYXRhYmFzZXMwHhcNMTgwNjI1MTQyOTAwWhcNMjgwNjIy
+    MTQyOTAwWjAeMRwwGgYDVQQDDBNJQk0gQ2xvdWQgRGF0YWJhc2VzMIIBIjANBgkq
+    hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8lpaQGzcFdGqeMlmqjffMPpIQhqpd8qJ
+    Pr3bIkrXJbTcJJ9uIckSUcCjw4Z/rSg8nnT13SCcOl+1to+7kdMiU8qOWKiceYZ5
+    y+yZYfCkGaiZVfazQBm45zBtFWv+AB/8hfCTdNF7VY4spaA3oBE2aS7OANNSRZSK
+    pwy24IUgUcILJW+mcvW80Vx+GXRfD9Ytt6PRJgBhYuUBpgzvngmCMGBn+l2KNiSf
+    weovYDCD6Vngl2+6W9QFAFtWXWgF3iDQD5nl/n4mripMSX6UG/n6657u7TDdgkvA
+    1eKI2FLzYKpoKBe5rcnrM7nHgNc/nCdEs5JecHb1dHv1QfPm6pzIxwIDAQABo1Aw
+    TjAdBgNVHQ4EFgQUK3+XZo1wyKs+DEoYXbHruwSpXjgwHwYDVR0jBBgwFoAUK3+X
+    Zo1wyKs+DEoYXbHruwSpXjgwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOC
+    AQEAJf5dvlzUpqaix26qJEuqFG0IP57QQI5TCRJ6Xt/supRHo63eDvKw8zR7tlWQ
+    lV5P0N2xwuSl9ZqAJt7/k/3ZeB+nYwPoyO3KvKvATunRvlPBn4FWVXeaPsG+7fhS
+    qsejmkyonYw77HRzGOzJH4Zg8UN6mfpbaWSsyaExvqknCp9SoTQP3D67AzWqb1zY
+    doqqgGIZ2nxCkp5/FXxF/TMb55vteTQwfgBy60jVVkbF7eVOWCv0KaNHPF5hrqbN
+    i+3XjJ7/peF3xMvTMoy35DcT3E2ZeSVjouZs15O90kI3k2daS2OHJABW0vSj4nLz
+    +PQzp/B9cQmOO8dCe049Q3oaUA==
+    -----END CERTIFICATE-----
+
+- type: replace
+  path: /instance_groups/name=diego-api/jobs/name=locket/properties/diego/locket/sql/require_ssl?
+  value: true
